@@ -1,0 +1,42 @@
+<html>
+    <head>
+        <title>cars</title>
+        <!--add a button that creates a row-->
+    </head>
+    <body> 
+        <table id="mainTable">
+            <tr>
+                <td>cars</td>
+                <td>page</td>
+                <td><button onclick="doRow(this)">output</button></td>
+            </tr>
+        </table>
+        <button onclick="createRow()">create row</button>
+    </body>
+    <script>
+        function doRow(buttonElement){
+            var rowElement = buttonElement.parentNode.parentNode
+            var data={}
+            data.cell0 = rowElement.cells[0].firstChild.textContent;
+            data.cell1 = rowElement.cells[1].firstChild.textContent;
+
+            console.log(JSON.stringify(data))
+        }
+
+        function createRow(){
+            var tableElement = document.getElementById('mainTable')
+            var data = {cell1:'car make',cell2:'car model',cell3:'car price'}
+
+            var rowElement = tableElement.insertRow(-1)
+            var cellElement = rowElement.insertCell(0)
+
+            cellElement.innerHTML = data.cell1;
+            var cellElement = rowElement.insertCell(1)
+            cellElement.innerHTML = data.cell2;
+            var cellElement = rowElement.insertCell(2)
+            cellElement.innerHTML = data.cell3;
+        
+        }
+    </script>
+
+</html>
