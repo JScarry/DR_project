@@ -8,11 +8,15 @@
 
 ### Repository contains 
 
-                server folder
-                db_calls folder
-                db_work folder
+                templates folder
+                venv folder
+                server.py
+                carDAO.py
+                dbconfig.py
+                car_db1.sql
                 requirements.txt
                 .gitignore
+                .env
                 Readme
                               
 
@@ -30,9 +34,9 @@ The project repository contains all the files required to allow the viewer to ca
 
 The running of this web application will require a number of packages.
 
-First, to run the `server.py` python will be required. It also requires some python packages. A list of Python packages required to run all labs and assignments is included in the requirements.txt file. When you have setup python and a virtual environment to run the files the required extra packages can be installed by rinning the command `pip install -r requirements.txt`
+First, to run the `server.py` python will be required. It also requires some python packages. A list of Python packages required to run all labs and assignments is included in the requirements.txt file. When you have setup python and a virtual environment to run the files the required extra packages can be installed by running the command: `pip install -r requirements.txt`
 
-Next to support accessing the database `car_DB1` mysql is required. The application has been configured to access the `car_db1` database with the username and password `root`. 
+Next to support accessing the database `car_db1` mysql is required. The application has been configured to access the `car_db1` database with the username and password `root`. The `car_db1.sql` is included in the repository.
 
 
 ## Starting the server
@@ -49,14 +53,33 @@ Press CTRL+C to quit
  * Debugger is active!
  * Debugger PIN: 168-648-133
 
-The server is now running.
-
+The server is now running on your machine in local mode! 
 
 ## Accessing the web page
 
 From your web browser search the adderss: http://127.0.0.1:5000
-This should open the cars web page. From there you can view and carryout CRUD operations on the `car_db1`.
 
+## Login
+
+A `Sign in` prompt will appear when you try to launch the webpage. You must sign in to view it.
+                Username = user
+                Password = pass
+
+The cars webpage should now be visible.
+From there you can view and carryout CRUD operations on the `car_db1`.
+
+
+## Server debug mode is on! 
+You can watch the requests in your cmd window as you browse the web page.
+Here is an example of a delete request:
+
+                127.0.0.1 - - [19/Dec/2023 11:31:56] "GET /cars HTTP/1.1" 200 -
+                delete done
+                127.0.0.1 - - [19/Dec/2023 11:32:05] "DELETE /cars/32 HTTP/1.1" 200 -
+
+
+## Stopping the server
+To stop the server running: Go to your cmd and press `ctrl` and  `C` together.
 
 ### End
 

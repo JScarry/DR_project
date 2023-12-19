@@ -1,0 +1,403 @@
+<!--
+    car.html 	HTML file to display a table view for cars
+			>Structured with a main body to include:
+			>headder and table to display car info.
+
+		Functions include:
+			>Create, Read, Update, Delete (CRUD) operations on car data table
+			>AJAX Calls: Utilizes JavaScript AJAX calls to communicate with the Flask
+			>Form Handling: doCreate(), doUpdate(), doDelete() functions to interact 
+			>with the server through AJAX calls.
+        
+        Sign in =   Username: user
+                    Password: pass
+-->
+
+            <!doctype html>
+            <html lang="en">
+                <head>
+                    <meta charset="utf-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1">
+                    <title>view Cars</title>
+                    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+                    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+                    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+                </head>
+
+<!-- Styles defined here -->
+                <style>   /* basic CSS styles */
+                        .highlight-background { /* styles for menu bar "add a car" */
+                        background-color: rgb(0, 255, 42); /* erd color */     
+                    }
+                        #createUpdateForm input { /* styles for "createUpdateForm" */
+                        margin-bottom: 10px; 
+                        display: block;
+                    }
+                    .table-wrapper {      /* styles to contain table */
+                        overflow-y: auto; /* verticle viewbar added if content overflows. */
+                        overflow-x: auto; /* horizontal viewbar added if content overflows. */
+                    }
+                        #randomCarDisplay { /* style for random car box */
+                        border: 2px solid #007bff;
+                        padding: 10px;
+                        margin-top: 20px;
+                        text-align: center;
+                        height: 50px;
+                    }
+            
+                </style>
+
+<!-- Style end and start of body html -->
+
+                <body>
+                    <!--navbar //Ref1  (getbootstrap.com, Get started with Bootstrap, Dec 2023)-->
+                    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+                        <div class="container-fluid">
+                            <a class="navbar-brand" href="{{ url_for('index') }}">Cars</a>
+                                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                                    <span class="navbar-toggler-icon"></span>
+                                </button>
+                            <div class="collapse navbar-collapse" id="navbarNav">
+                                <ul class="navbar-nav">
+                                    <li class="nav-item">
+                                        <a class="nav-link active highlight-background" aria-current="page" href="#" onclick="showCreate()">Add a Car</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                      </nav>
+                    <!--marquee  //Ref1  (getbootstrap.com, Get started with Bootstrap, Dec 2023)-->
+                    <div class="col-md-4">
+                        <h4>Featured cars:</h4>
+                    </div>
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-lg-10 offset-lg-1">
+                                <div class="px-lg-4">
+                                    <marquee direction="left" id="carNamesMarquee"></marquee> <!--display the list of car scrolling //Ref3  (w3schools.in, HTML marquee tag, Dec 2023) -->
+                                    <h4 id="randomCarDisplay"></h4>         <!--display the random car in a box. //Ref2  (stackoverflow.com, looping through html table, Dec 2023)-->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <h4>Browse all cars:</h4>
+                    </div>
+                    <div class="container">                                 <!--Ref1  (getbootstrap.com, Get started with Bootstrap, Dec 2023)-->
+                        <div class="row">
+                            <div class="col-md-8">
+                                <!--table-->
+                                <div class="table-responsive-lg">           <!--//ref7 (stackoverflow.com, Scrollbar on bootstrap table, Dec 2023) -->
+                                    <div class="table-wrapper" style="max-height: 60vh;"> <!--table height set to 70% of view height -->
+                                        <table class="table" id="carTable" style="width: 100%;"> 
+                                            <tr>
+                                                    <th>id</th>
+                                                    <th>Make</th>
+                                                    <th>Model</th>
+                                                    <th>Registration</th>
+                                                    <th>Price</th>
+                                                    <th>Update</th>
+                                                    <th>Delete</th>
+                                                    <th>View</th>
+                                            </tr>  
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-lg-4">
+                                <!-- Image column -->
+                                <img src="https://cdn.pixabay.com/photo/2015/06/03/13/38/plymouth-796441_1280.jpg" alt="Sample Image" class="img-fluid">
+                                <!-- Image or content display here -->
+                            </div>
+                        </div>
+                    </div>
+                    <div id='createUpdateForm' style="display: none">
+                            <h5><span id="createLabel">Create a</span> <span id="updateLabel">Update a</span> Car</h5>
+                            <input type="hidden" name="id"/>
+                            Make <input type="text" name="make" /><br/>  
+                            Model <input type="text" name="model"/> <br/>
+                            Registration <input type="text" name="registration"/> <br>
+                            Price <input type="number" name="price"/> <br/>
+                            <span><button id="doCreateButton" onclick="doCreate()">Create</button></span>
+                            <span><button id="doUpdateButton" onclick="doUpdate()">Update</button></span>
+                    </div>
+                    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+                </body>
+
+<!-- Body (html) end and start of script (java script) -->
+
+                <script>
+                function showCreate(){
+                    // document.getElementById('showCreateButton').style.display="none"
+                    document.getElementById('carTable').style.display="none"
+                    document.getElementById('createUpdateForm').style.display="block"
+            
+                    document.getElementById('createLabel').style.display="inline"
+                    document.getElementById('updateLabel').style.display="none"
+            
+                    document.getElementById('doCreateButton').style.display="block"
+                    document.getElementById('doUpdateButton').style.display="none"
+            
+                }
+                function showViewAll(){
+                    // document.getElementById('showCreateButton').style.display="block"
+                    document.getElementById('carTable').style.display="block"
+                    document.getElementById('createUpdateForm').style.display="none"
+                }
+                function showUpdate(buttonElement){
+                    // document.getElementById('showCreateButton').style.display="none"
+                    document.getElementById('carTable').style.display="none"
+                    document.getElementById('createUpdateForm').style.display="block"
+            
+                    document.getElementById('createLabel').style.display="none"
+                    document.getElementById('updateLabel').style.display="inline"
+            
+                    document.getElementById('doCreateButton').style.display="none"
+                    document.getElementById('doUpdateButton').style.display="block"
+            
+            
+                    var rowElement = buttonElement.parentNode.parentNode
+                    // these is a way of finding the closest <tr> which would safer, closest()
+                    
+                    var car = getCarFromRow(rowElement)
+                    populateFormWithCar(car)
+                }
+                function showDetails(car) {  //function to show the car details in a popup.
+                    var details = `ID: ${car.id}<br>`;
+                    details += `Make: ${car.make}<br>`;
+                    details += `Model: ${car.model}<br>`;
+                    details += `Registration: ${car.registration}<br>`;
+                    details += `Price: ${car.price}<br>`;
+
+                    // Open a popup window and write car details to it
+                    var popupWindow = window.open('', '_blank', 'width=400,height=400');
+                    popupWindow.document.write('<html><head><title>Car Details</title></head><body>');
+                    popupWindow.document.write('<h2>Car Details</h2>');
+                    popupWindow.document.write(details);
+                    popupWindow.document.write('</body></html>');
+                    popupWindow.document.close();
+                }
+
+                function doCreate(){
+                    var form = document.getElementById('createUpdateForm')
+            
+                    var car = {}
+                   
+                    car.make = form.querySelector('input[name="make"]').value
+                    car.model = form.querySelector('input[name="model"]').value
+                    car.registration = form.querySelector('input[name="registration"]').value
+                    car.price = form.querySelector('input[name="price"]').value
+                    console.log(JSON.stringify(car))
+                    createCarAjax(car)
+                    location.reload();   
+                }
+                
+                function doUpdate(){
+                    var car = getCarFromForm();
+                    var rowElement = document.getElementById(car.id);
+                    updateCarAjax(car);
+                    setCarInRow(rowElement,car);
+                    clearForm();
+                    showViewAll();
+                }
+                function doDelete(r){
+                    var tableElement = document.getElementById('carTable');
+                    var rowElement = r.parentNode.parentNode;
+                    var index = rowElement.rowIndex;
+                    deleteCarAjax(rowElement.getAttribute("id"));
+                    tableElement.deleteRow(index);
+                }
+                function addCarToTable(car){
+                    var tableElement = document.getElementById('carTable')
+                    var rowElement = tableElement.insertRow(-1)
+                    rowElement.setAttribute('id',car.id)
+                    var cell1 = rowElement.insertCell(0);
+                    cell1.innerHTML = car.id
+                    var cell2 = rowElement.insertCell(1);
+                    cell2.innerHTML = car.make
+                    var cell3 = rowElement.insertCell(2);
+                    cell3.innerHTML = car.model
+                    var cell3 = rowElement.insertCell(3);
+                    cell3.innerHTML = car.registration
+                    var cell4 = rowElement.insertCell(4);
+                    cell4.innerHTML = car.price
+                    var cell5 = rowElement.insertCell(5);
+                    cell5.innerHTML = '<button onclick="showUpdate(this)">Update</button>'
+                    var cell6 = rowElement.insertCell(6);
+                    cell6.innerHTML = '<button onclick=doDelete(this)>delete</button>'
+                    var cell7 = rowElement.insertCell(7);
+                    //cell7.innerHTML = '<button onclick=showDetails(car)>View</button>'  //this worked but wouldn't pass the correct car.
+                    var viewButton = document.createElement('button'); //added view button. It takes the car object and displays in a window.
+                    viewButton.textContent = 'View';    //button name
+                    viewButton.onclick = function() {   //calls the function when clicked
+                        showDetails(car);               //ref6 (medium.com, Common mistake using Closures, Dec 2023)
+                    };                                  //had to use anonymous function() to assign an event handler correctly to the onclick
+                    cell7.appendChild(viewButton);      //how to use an anonymous function to pass parameters into the event listener.
+                }                                       //ref5 (developer.mozilla.org, EventTarget: addEventListener() method, Dec 2023)
+            
+                function clearForm(){
+                    var form = document.getElementById('createUpdateForm')
+            
+                    form.querySelector('input[name="make"]').value=''
+                    form.querySelector('input[name="model"]').value=''
+                    form.querySelector('input[name="registration"]').value=''
+                    form.querySelector('input[name="price"]').value=''
+                }
+                function getCarFromRow(rowElement){
+                    var car ={}
+                    car.id  = rowElement.getAttribute('id')
+                    car.make = rowElement.cells[1].firstChild.textContent
+                    car.model = rowElement.cells[2].firstChild.textContent
+                    car.registration = rowElement.cells[3].firstChild.textContent
+                    car.price = parseInt(rowElement.cells[4].firstChild.textContent,10)
+                    console.log(car)
+                    return car
+                }
+                function setCarInRow(rowElement, car){
+                    rowElement.cells[0].firstChild.textContent= car.id  
+                    rowElement.cells[1].firstChild.textContent= car.make 
+                    rowElement.cells[2].firstChild.textContent= car.model
+                    rowElement.cells[3].firstChild.textContent= car.registration
+                    rowElement.cells[4].firstChild.textContent= car.price
+                }
+                function populateFormWithCar(car){
+                    var form = document.getElementById('createUpdateForm')
+                    form.querySelector('input[name="id"]').disabled = true
+            
+                    form.querySelector('input[name="id"]').value  = car.id 
+                    form.querySelector('input[name="make"]').value= car.make
+                    form.querySelector('input[name="model"]').value= car.model
+                    form.querySelector('input[name="registration"]').value= car.registration
+                    form.querySelector('input[name="price"]').value= car.price
+                    return car
+                }
+                function getCarFromForm(){
+                    var form = document.getElementById('createUpdateForm')
+                    var car = {}
+                    car.id = form.querySelector('input[name="id"]').value
+                    car.make = form.querySelector('input[name="make"]').value
+                    car.model = form.querySelector('input[name="model"]').value
+                    car.registration = form.querySelector('input[name="registration"]').value
+                    car.price = parseInt(form.querySelector('input[name="price"]').value,10)
+                    console.log(JSON.stringify(car))
+                    console.log(car.model)
+                    return car
+                }
+                function getAllAjax(){   /*function to make an HTTP GET request to the specified URL http://127.0.0.1:5000/cars */
+                    $.ajax({                /*gets data (JSON format) to populate the HTML table. With error handling */
+                        "url": "http://127.0.0.1:5000/cars",
+                        "method":"GET",
+                        "data":"",
+                        "dataType": "JSON",
+                        "success":function(result){
+                            console.log(result);
+                            for (car of result){
+                                addCarToTable(car);
+                            }
+                            
+                        },
+                        "error":function(xhr,status,error){
+                            console.log("error: "+status+" msg:"+error);
+                        }
+                    });
+            
+                }
+                function createCarAjax(car){    //adds the created car to the table
+                    console.log(JSON.stringify(car));
+                    $.ajax({
+                        "url": "http://127.0.0.1:5000/cars",
+                        "method":"POST",
+                        "data":JSON.stringify(car),
+                        "dataType": "JSON",
+                        contentType: "application/json; charset=utf-8",
+                        "success":function(result){
+                            console.log(result);
+                            car.id = result.id
+                            addCarToTable(car)
+                            clearForm()
+                            showViewAll()
+                        },
+                        "error":function(xhr,status,error){
+                            console.log("error: "+status+" msg:"+error);
+                        }
+                    });
+                }
+                function updateCarAjax(car){    //update deatils of car chosen by car id
+                    console.log(JSON.stringify(car));
+                    $.ajax({
+                        "url": "http://127.0.0.1:5000/cars/"+encodeURI(car.id),
+                        "method":"PUT",
+                        "data":JSON.stringify(car),
+                        "dataType": "JSON",
+                        contentType: "application/json; charset=utf-8",
+                        "success":function(result){
+                        console.log(result);
+                              
+                        },
+                        "error":function(xhr,status,error){
+                            console.log("error: "+status+" msg:"+error);
+                        }
+                    });
+                }
+                function deleteCarAjax(id){     // delete car chosen by id
+                    $.ajax({
+                        "url": "http://127.0.0.1:5000/cars/"+encodeURI(id),
+                        "method":"DELETE",
+                        "data":"",
+                        "dataType": "JSON",
+                        contentType: "application/json; charset=utf-8",
+                        "success":function(result){
+                        console.log(result);
+                              
+                        },
+                        "error":function(xhr,status,error){
+                            console.log("error: "+status+" msg:"+error);
+                        }
+                    });
+                }
+                function getScrollText() {  //pull car names from the table in the .html (instead of the DB) //Ref2  (stackoverflow.com, looping through html table, Dec 2023) 
+                    let carNamesString = '';    //car names list
+                    const rows = document.querySelectorAll("#carTable tr"); //access the table rows by class name
+            
+                    rows.forEach(row => {  // loop through rows and get the car names
+                        const cells = row.querySelectorAll("td"); //iterate through each row. use querySelectorAll method to find the td elements 
+                        if (cells.length >= 3) { // enough cells for make and model
+                            const carName = cells[1].innerText + ' ' + cells[2].innerText; //make and model from cells 1 and 2
+                            carNamesString += carName + ' | '; //concatenate car names seperated by | into a string
+                        }
+                    });
+                    document.getElementById('carNamesMarquee').innerText = carNamesString; // display scroll text
+            
+                    const carNamesArray = carNamesString.split(' | '); // split out the list into an array
+                    const randomIndex = Math.floor(Math.random() * carNamesArray.length);//get a random index from the carNamesArray
+                    const randomCar = carNamesArray[randomIndex]; //get the car at the random index  //Ref4  (stackoverflow, How to get random value from an array, Dec 2023)
+            
+                    document.getElementById('randomCarDisplay').innerText = 'Manager\'s Pick: ' + randomCar; // random car display element
+                }         
+                
+                getAllAjax();
+                setTimeout(getScrollText, 1000); //wait until table is populated before pulling text
+                
+                </script>
+            </html>
+            
+ <!-- Page end!-->
+ 
+ 
+<!--//References
+//Ref1  (getbootstrap.com, Get started with Bootstrap, Dec 2023)
+                //retreived from: https://getbootstrap.com/docs/5.3/getting-started/introduction/
+//Ref2  (stackoverflow.com, looping through html table, Dec 2023) 
+                //retreived from: https://stackoverflow.com/questions/32494714/looping-through-html-table-and-store-td-values-as-a-string-using-jquery-javasc
+//Ref3  (w3schools.in, HTML marquee tag, Dec 2023) 
+                //retreived from: https://www.w3schools.in/html/marquee-tag?utm_content=cmp-true
+//Ref4  (stackoverflow, How to get random value from an array, Dec 2023) 
+                //retreived from: https://stackoverflow.com/questions/26165455/how-to-get-random-value-from-an-array
+//ref5 (developer.mozilla.org, EventTarget: addEventListener() method, Dec 2023) 
+                //retreived from: https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener
+//ref6 (medium.com, Common mistake using Closures, Dec 2023) 
+                //retreived from: https://medium.com/@leonardobrunolima/javascript-tips-common-mistake-using-closures-35d7b55f5380
+//ref7 (stackoverflow.com, Scrollbar on bootstrap table, Dec 2023)
+                //retreived from: https://stackoverflow.com/questions/39768189/scrollbar-on-bootstrap-table
+            -->
+            
