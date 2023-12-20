@@ -12,6 +12,7 @@
                 venv folder
                 server.py
                 carDAO.py
+                csoDAO.py
                 dbconfig.py
                 car_db1.sql
                 requirements.txt
@@ -21,12 +22,16 @@
                               
 
 # Web application project overview: 
-The projects consists of files to support the running of a flask server that supports a webpage. On the webpage the user can view a database of cars. The database holds a data on each car. The viewer can create, read, update and delete (CRUD) entries one at a time.   
+The projects consists of files to support the running of a flask server that supports a webpage. On the webpage the user can view a database of cars on a html table. The database holds data on each car. The viewer can create, read, update, view and delete (CRUD) entries one at a time.   
+
+The server also links to a 3rd party API. 
+(https://data.cso.ie/  datasets "TEM20" "New Private Cars Licensed for the First Time")
+The user can search this database by a search form on the webpage. It allows the user to filters data by year and month.
 
 The project repository contains all the files required to allow the viewer to carry out these operations. The operations are seperated into the following:
         A Flask server 
-        REST API, (to perform CRUD operations)
-        A mysql database with a table
+        REST API (to perform CRUD operations)
+        A mysql database with a table.
         Accompanying web interface, using AJAX calls, to perform these CRUD operations
 
 
@@ -77,6 +82,14 @@ Here is an example of a delete request:
                 delete done
                 127.0.0.1 - - [19/Dec/2023 11:32:05] "DELETE /cars/32 HTTP/1.1" 200 -
 
+## Using the page
+Browse and carryout CRUD operations by the buttons on the table.
+Search cso.ie resource by the search search function.
+Some features:
+        A list of cars in the database is scrolled acress the top of the page, under the nav bar.
+        Random car picked from the table is displayed as "Manager's Pick". Updates when page is refreshed.
+        Bootstrap styling to adapt page for screen size.
+        Search cso.ie database of car registrations.
 
 ## Stopping the server
 To stop the server running: Go to your cmd and press `ctrl` and  `C` together.

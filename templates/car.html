@@ -11,6 +11,7 @@
         
         Sign in =   Username: user
                     Password: pass
+        
 -->
 
             <!doctype html>
@@ -26,10 +27,10 @@
 
 <!-- Styles defined here -->
                 <style>   /* basic CSS styles */
-                        .highlight-background { /* styles for menu bar "add a car" */
+                    .highlight-background { /* styles for menu bar "add a car" */
                         background-color: rgb(0, 255, 42); /* erd color */     
                     }
-                        #createUpdateForm input { /* styles for "createUpdateForm" */
+                    #createUpdateForm input { /* styles for "createUpdateForm" */
                         margin-bottom: 10px; 
                         display: block;
                     }
@@ -37,14 +38,39 @@
                         overflow-y: auto; /* verticle viewbar added if content overflows. */
                         overflow-x: auto; /* horizontal viewbar added if content overflows. */
                     }
-                        #randomCarDisplay { /* style for random car box */
-                        border: 2px solid #007bff;
+                    .managers-pick {
+                        border: 3px solid #007bff;
                         padding: 10px;
+                        border-radius: 5px;
                         margin-top: 20px;
                         text-align: center;
                         height: 50px;
                     }
-            
+                    .search-area {
+                        border: 3px solid #007bff;
+                        border-radius: 5px;
+                        padding: 15px;
+                        margin-bottom: 20px;
+                    }
+                    .thumb-image:hover {
+                        transition: transform 0.2s;    /* Add smooth transition */
+                        transform: scale(1.2);         /* Scale the image on hover */
+                        cursor: pointer;               /* Change cursor to pointer on hover */
+                    }
+                    
+                    #searchButton:hover::before {     /*ref8  (w3schools.com, css tooltip, Dec 2023) */
+                        content: "Source: CSO.ie \"New Private Cars Licensed for the First Time\""; /* text for the tooltip */
+                        display: block;           
+                        position: absolute;
+                        color: black;
+                        border: 3px solid #007bff;
+                        padding: 8px 15px;
+                        border-radius: 5px;
+                        margin-top: -65px;
+                        margin-left: 85px;
+                        background: white;
+                        width: 250px;
+                    }
                 </style>
 
 <!-- Style end and start of body html -->
@@ -64,6 +90,11 @@
                                     </li>
                                 </ul>
                             </div>
+                            <a href="#" onclick="location.reload(); return false;">
+                                <!-- Thumbnail image styled as a link -->
+                                <img src="https://cdn.pixabay.com/photo/2015/06/03/13/38/plymouth-796441_1280.jpg" alt="Sample Image"
+                                    class="img-thumbnail thumb-image" style="width: 60px; height: auto;">
+                            </a>
                         </div>
                       </nav>
                     <!--marquee  //Ref1  (getbootstrap.com, Get started with Bootstrap, Dec 2023)-->
@@ -75,17 +106,29 @@
                             <div class="col-lg-10 offset-lg-1">
                                 <div class="px-lg-4">
                                     <marquee direction="left" id="carNamesMarquee"></marquee> <!--display the list of car scrolling //Ref3  (w3schools.in, HTML marquee tag, Dec 2023) -->
-                                    <h4 id="randomCarDisplay"></h4>         <!--display the random car in a box. //Ref2  (stackoverflow.com, looping through html table, Dec 2023)-->
+                                    <div class= "managers-pick">
+                                        <h4 id="randomCarDisplay"></h4>         <!--display the random car in a box. //Ref2  (stackoverflow.com, looping through html table, Dec 2023)-->
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <h4>Browse all cars:</h4>
+                    <div class="col-md-4"><br>
+                        <h4>Browse all cars in our database:</h4>
                     </div>
                     <div class="container">                                 <!--Ref1  (getbootstrap.com, Get started with Bootstrap, Dec 2023)-->
                         <div class="row">
                             <div class="col-md-8">
+                                <div id='createUpdateForm' style="display: none">
+                                    <h5><span id="createLabel">Create a</span> <span id="updateLabel">Update a</span> Car</h5>
+                                    <input type="hidden" name="id"/>
+                                    Make <input type="text" name="make" /><br/>  
+                                    Model <input type="text" name="model"/> <br/>
+                                    Registration <input type="text" name="registration"/> <br>
+                                    Price <input type="number" name="price"/> <br/>
+                                    <span><button id="doCreateButton" onclick="doCreate()">Create</button></span>
+                                    <span><button id="doUpdateButton" onclick="doUpdate()">Update</button></span>
+                                </div>
                                 <!--table-->
                                 <div class="table-responsive-lg">           <!--//ref7 (stackoverflow.com, Scrollbar on bootstrap table, Dec 2023) -->
                                     <div class="table-wrapper" style="max-height: 60vh;"> <!--table height set to 70% of view height -->
@@ -105,21 +148,51 @@
                                 </div>
                             </div>
                             <div class="col-md-4 col-lg-4">
-                                <!-- Image column -->
-                                <img src="https://cdn.pixabay.com/photo/2015/06/03/13/38/plymouth-796441_1280.jpg" alt="Sample Image" class="img-fluid">
-                                <!-- Image or content display here -->
+                                <div class= "search-area"> <!-- css added border -->
+                                    <h5 class="text-center mb-3">What Cars did other people buy?</h5> <!--heading for car search -->
+                                    <h6 class="text-center mb-3">Search recent new car registrations by year and month</h6>
+                                    <div class="container">
+                                        <div class="row">
+                                            <div class="col-md-8">
+                                                <form id="searchForm" onsubmit="searchCar(); return false;"> <!--form submit calls the function in the script below-->
+                                                    <div class="col-sm-8">
+                                                        <select id="year" name="year" class="form-select mb-3" style="width: 150%;">
+                                                            <option value="2014">2014</option>  <!--form selection choices hard coded-->
+                                                            <option value="2015">2015</option> 
+                                                            <option value="2016">2016</option>
+                                                            <option value="2017">2017</option>
+                                                            <option value="2018">2018</option>
+                                                            <option value="2019">2019</option>
+                                                            <option value="2020">2020</option>
+                                                            <option value="2021">2021</option>
+                                                            <option value="2022">2022</option>
+                                                            <option value="2023">2023</option>
+                                                        </select>
+                                                        <select id="month" name="month" class="form-select mb-3" style="width: 150%;">
+                                                            <option value="January">January</option>
+                                                            <option value="February">February</option>
+                                                            <option value="March">March</option>
+                                                            <option value="April">April</option>
+                                                            <option value="May">May</option>
+                                                            <option value="June">June</option>
+                                                            <option value="July">July</option>
+                                                            <option value="August">August</option>
+                                                            <option value="September">September</option>
+                                                            <option value="October">October</option> <!--Newers data in cso file is Sept 2023-->
+                                                            <option value="November">November</option> <!--Error message sent from findCar() function in csoDAO.py-->
+                                                            <option value="December">December</option>  <!--if there is no data available-->
+                                                        </select>
+                                                        <button type="submit" class="btn btn-primary" id="searchButton">Search</button>
+                                                    </div>
+                                                </form>
+                                                <div></div><br>
+                                                <div id="searchResult" class="w-200"></div></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div id='createUpdateForm' style="display: none">
-                            <h5><span id="createLabel">Create a</span> <span id="updateLabel">Update a</span> Car</h5>
-                            <input type="hidden" name="id"/>
-                            Make <input type="text" name="make" /><br/>  
-                            Model <input type="text" name="model"/> <br/>
-                            Registration <input type="text" name="registration"/> <br>
-                            Price <input type="number" name="price"/> <br/>
-                            <span><button id="doCreateButton" onclick="doCreate()">Create</button></span>
-                            <span><button id="doUpdateButton" onclick="doUpdate()">Update</button></span>
                     </div>
                     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
                 </body>
@@ -355,6 +428,7 @@
                         }
                     });
                 }
+                
                 function getScrollText() {  //pull car names from the table in the .html (instead of the DB) //Ref2  (stackoverflow.com, looping through html table, Dec 2023) 
                     let carNamesString = '';    //car names list
                     const rows = document.querySelectorAll("#carTable tr"); //access the table rows by class name
@@ -375,6 +449,26 @@
                     document.getElementById('randomCarDisplay').innerText = 'Manager\'s Pick: ' + randomCar; // random car display element
                 }         
                 
+
+                
+                function searchCar() {  //copy of 
+                    var year = document.getElementById('year').value;
+                    var month = document.getElementById('month').value;
+                    $.ajax({   // request to find the car
+                        "url": "/find_car", // search request find_car
+                        "method": "POST",
+                        "data": JSON.stringify({ "year": year, "month": month }), //pass in year and month
+                        "dataType": "JSON",
+                        contentType: "application/json; charset=utf-8",
+                        "success": function (result) {
+                            document.getElementById('searchResult').innerHTML = "The " + result + " was the most popular car in Ireland in  " + month + " " + year;
+                        },
+                        "error": function (xhr, status, error) {
+                            console.log("error: " + status + " msg:" + error);
+                        }
+                    });
+                }
+
                 getAllAjax();
                 setTimeout(getScrollText, 1000); //wait until table is populated before pulling text
                 
@@ -385,6 +479,8 @@
  
  
 <!--//References
+
+// Acknowledgment to Lecturer: Andrew Beatty for guidance through the 23-24: DATA REPRESENTATION module.
 //Ref1  (getbootstrap.com, Get started with Bootstrap, Dec 2023)
                 //retreived from: https://getbootstrap.com/docs/5.3/getting-started/introduction/
 //Ref2  (stackoverflow.com, looping through html table, Dec 2023) 
@@ -399,5 +495,7 @@
                 //retreived from: https://medium.com/@leonardobrunolima/javascript-tips-common-mistake-using-closures-35d7b55f5380
 //ref7 (stackoverflow.com, Scrollbar on bootstrap table, Dec 2023)
                 //retreived from: https://stackoverflow.com/questions/39768189/scrollbar-on-bootstrap-table
+//ref8  (w3schools.com, css tooltip, Dec 2023)
+                //retreived from: https://www.w3schools.com/css/css_tooltip.asp
             -->
             

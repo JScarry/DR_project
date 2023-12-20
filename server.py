@@ -8,6 +8,7 @@
 from flask import Flask, render_template, jsonify, request, abort
 from dotenv import load_dotenv
 from carDAO import carDAO
+import csoDAO 
 from utils import auth_required
 import os
 import json
@@ -86,12 +87,20 @@ def create_app():
         carDAO.delete(id)
         return jsonify({"done":True})
     
+    @app.route('/find_car', methods=['POST'])
+    @auth_required  
+    def find_car():
+        year = request.json.get('year')  ##get the year and month from the POST request data
+        month = request.json.get('month')
+        result = csoDAO.findCar(year, month)  #call the findCar function from csoDAO.py
+        return jsonify(result) # return json result
     return app
 
 if __name__ == '__main__' :
     app = create_app()  #call the function to creates instance of a flask
     app.run(debug=True)  #start the Flask application using the run() method
 
-
+## Acknowledgment to Lecturer: Andrew Beatty for guidance through the 23-24: DATA REPRESENTATION module.
+    
 ## ref1 (youtube.com, Login System in Flask: HTTP Basic Auth, Dec 2023) 
                 ##retreived from: https://www.youtube.com/watch?v=8VmpH2f1jOk
