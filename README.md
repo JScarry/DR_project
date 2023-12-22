@@ -96,6 +96,10 @@ Some features:
 ## Stopping the server
 To stop the server running: Go to your cmd and press `ctrl` and  `C` together.
 
+## References and Acknowledgements
+Acknowledgment to Lecturer Andrew Beatty for guidance through the 23-24: DATA REPRESENTATION module.
+Specific references throughout the code.
+
 ### End
 
 
