@@ -67,7 +67,9 @@ From your web browser search the adderss: http://127.0.0.1:5000
 ## Login
 
 A `Sign in` prompt will appear when you try to launch the webpage. You must sign in to view it.
+
                 Username = user
+
                 Password = pass
 
 The cars webpage should now be visible.

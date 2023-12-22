@@ -6,7 +6,8 @@
 		Functions include:
 			>Create, Read, Update, Delete (CRUD) operations on car data table
 			>AJAX Calls: Utilizes JavaScript AJAX calls to communicate with the Flask
-			>Form Handling: doCreate(), doUpdate(), doDelete() functions to interact 
+			>Form Handling: doCreate(), doUpdate(), doDelete() functions to interact
+            >searchCars() from a cso.ie database
 			>with the server through AJAX calls.
         
         Sign in =   Username: user
@@ -14,7 +15,7 @@
         
 -->
 
-            <!doctype html>
+            <!doctype html>  
             <html lang="en">
                 <head>
                     <meta charset="utf-8">
@@ -200,25 +201,22 @@
 <!-- Body (html) end and start of script (java script) -->
 
                 <script>
-                function showCreate(){
-                    // document.getElementById('showCreateButton').style.display="none"
-                    document.getElementById('carTable').style.display="none"
-                    document.getElementById('createUpdateForm').style.display="block"
-            
-                    document.getElementById('createLabel').style.display="inline"
-                    document.getElementById('updateLabel').style.display="none"
-            
-                    document.getElementById('doCreateButton').style.display="block"
-                    document.getElementById('doUpdateButton').style.display="none"
+                function showCreate(){          //showcreate function to display the update form
+                    document.getElementById('carTable').style.display="none"            // hides the car table        
+                    document.getElementById('createUpdateForm').style.display="block"   // displays the update form
+
+                    document.getElementById('createLabel').style.display="inline"       // shows the create label
+                    document.getElementById('updateLabel').style.display="none"         // hides the update label
+
+                    document.getElementById('doCreateButton').style.display="block"     // shows the create button
+                    document.getElementById('doUpdateButton').style.display="none"      // hides the update button
             
                 }
                 function showViewAll(){
-                    // document.getElementById('showCreateButton').style.display="block"
                     document.getElementById('carTable').style.display="block"
                     document.getElementById('createUpdateForm').style.display="none"
                 }
                 function showUpdate(buttonElement){
-                    // document.getElementById('showCreateButton').style.display="none"
                     document.getElementById('carTable').style.display="none"
                     document.getElementById('createUpdateForm').style.display="block"
             
@@ -228,34 +226,29 @@
                     document.getElementById('doCreateButton').style.display="none"
                     document.getElementById('doUpdateButton').style.display="block"
             
-            
-                    var rowElement = buttonElement.parentNode.parentNode
-                    // these is a way of finding the closest <tr> which would safer, closest()
-                    
+                                                        //get the target car data from the table into the form
+                    var rowElement = buttonElement.parentNode.parentNode 
                     var car = getCarFromRow(rowElement)
                     populateFormWithCar(car)
                 }
-                function showDetails(car) {  //function to show the car details in a popup.
-                    var details = `ID: ${car.id}<br>`;
-                    details += `Make: ${car.make}<br>`;
+                function showDetails(car) {             //function to show the car details in a popup.
+                    var details = `ID: ${car.id}<br>`;  //details variable made and string concatinated
+                    details += `Make: ${car.make}<br>`; //to make up full details of the car.
                     details += `Model: ${car.model}<br>`;
                     details += `Registration: ${car.registration}<br>`;
                     details += `Price: ${car.price}<br>`;
-
-                    // Open a popup window and write car details to it
-                    var popupWindow = window.open('', '_blank', 'width=400,height=400');
-                    popupWindow.document.write('<html><head><title>Car Details</title></head><body>');
-                    popupWindow.document.write('<h2>Car Details</h2>');
-                    popupWindow.document.write(details);
-                    popupWindow.document.write('</body></html>');
-                    popupWindow.document.close();
+                                                        // open a popup window and write car details to it
+                    var popupWindow = window.open('', '_blank', 'width=400,height=300'); //call and specify window
+                    popupWindow.document.write('<html><head><title>Car Details</title></head><body>'); //give the window a name
+                    popupWindow.document.write('<h2>Car Details</h2>'); //write headding
+                    popupWindow.document.write(details);//write the "details" in the popup window
+                    popupWindow.document.write('</body></html>');   //end text body
+                    popupWindow.document.close();       //closes the document being written to the window
                 }
 
                 function doCreate(){
                     var form = document.getElementById('createUpdateForm')
-            
                     var car = {}
-                   
                     car.make = form.querySelector('input[name="make"]').value
                     car.model = form.querySelector('input[name="model"]').value
                     car.registration = form.querySelector('input[name="registration"]').value
@@ -281,10 +274,10 @@
                     tableElement.deleteRow(index);
                 }
                 function addCarToTable(car){
-                    var tableElement = document.getElementById('carTable')
-                    var rowElement = tableElement.insertRow(-1)
-                    rowElement.setAttribute('id',car.id)
-                    var cell1 = rowElement.insertCell(0);
+                    var tableElement = document.getElementById('carTable') //get the HTML table element
+                    var rowElement = tableElement.insertRow(-1)             //insert new row at the table end
+                    rowElement.setAttribute('id',car.id)    //insert car id to the table
+                    var cell1 = rowElement.insertCell(0); //inserts cells for car attributes
                     cell1.innerHTML = car.id
                     var cell2 = rowElement.insertCell(1);
                     cell2.innerHTML = car.make
@@ -295,11 +288,10 @@
                     var cell4 = rowElement.insertCell(4);
                     cell4.innerHTML = car.price
                     var cell5 = rowElement.insertCell(5);
-                    cell5.innerHTML = '<button onclick="showUpdate(this)">Update</button>'
+                    cell5.innerHTML = '<button onclick="showUpdate(this)">Update</button>' //add buttons for update and delete
                     var cell6 = rowElement.insertCell(6);
                     cell6.innerHTML = '<button onclick=doDelete(this)>delete</button>'
                     var cell7 = rowElement.insertCell(7);
-                    //cell7.innerHTML = '<button onclick=showDetails(car)>View</button>'  //this worked but wouldn't pass the correct car.
                     var viewButton = document.createElement('button'); //added view button. It takes the car object and displays in a window.
                     viewButton.textContent = 'View';    //button name
                     viewButton.onclick = function() {   //calls the function when clicked
@@ -356,8 +348,8 @@
                     console.log(car.model)
                     return car
                 }
-                function getAllAjax(){   /*function to make an HTTP GET request to the specified URL http://127.0.0.1:5000/cars */
-                    $.ajax({                /*gets data (JSON format) to populate the HTML table. With error handling */
+                function getAllAjax(){                  //function to make an HTTP GET request to the specified URL http://127.0.0.1:5000/cars
+                    $.ajax({                            //gets data (JSON format) to populate the HTML table. With error handling
                         "url": "http://127.0.0.1:5000/cars",
                         "method":"GET",
                         "data":"",
@@ -375,11 +367,11 @@
                     });
             
                 }
-                function createCarAjax(car){    //adds the created car to the table
+                function createCarAjax(car){            //adds the created car to the table
                     console.log(JSON.stringify(car));
                     $.ajax({
                         "url": "http://127.0.0.1:5000/cars",
-                        "method":"POST",
+                        "method":"POST",                //POST request sent to the server at the URL
                         "data":JSON.stringify(car),
                         "dataType": "JSON",
                         contentType: "application/json; charset=utf-8",
@@ -395,7 +387,7 @@
                         }
                     });
                 }
-                function updateCarAjax(car){    //update deatils of car chosen by car id
+                function updateCarAjax(car){            //update deatils of car chosen by car id
                     console.log(JSON.stringify(car));
                     $.ajax({
                         "url": "http://127.0.0.1:5000/cars/"+encodeURI(car.id),
@@ -412,7 +404,7 @@
                         }
                     });
                 }
-                function deleteCarAjax(id){     // delete car chosen by id
+                function deleteCarAjax(id){             // delete car chosen by id
                     $.ajax({
                         "url": "http://127.0.0.1:5000/cars/"+encodeURI(id),
                         "method":"DELETE",
@@ -429,48 +421,46 @@
                     });
                 }
                 
-                function getScrollText() {  //pull car names from the table in the .html (instead of the DB) //Ref2  (stackoverflow.com, looping through html table, Dec 2023) 
-                    let carNamesString = '';    //car names list
+                function getScrollText() {              //pull car names from the table in the .html (instead of the DB) //Ref2  (stackoverflow.com, looping through html table, Dec 2023) 
+                    let carNamesString = '';            //car names list
                     const rows = document.querySelectorAll("#carTable tr"); //access the table rows by class name
             
-                    rows.forEach(row => {  // loop through rows and get the car names
+                    rows.forEach(row => {               // loop through rows and get the car names
                         const cells = row.querySelectorAll("td"); //iterate through each row. use querySelectorAll method to find the td elements 
-                        if (cells.length >= 3) { // enough cells for make and model
+                        if (cells.length >= 3) {        // enough cells for make and model
                             const carName = cells[1].innerText + ' ' + cells[2].innerText; //make and model from cells 1 and 2
-                            carNamesString += carName + ' | '; //concatenate car names seperated by | into a string
+                            carNamesString += carName + ' | ';              //concatenate car names seperated by | into a string
                         }
                     });
                     document.getElementById('carNamesMarquee').innerText = carNamesString; // display scroll text
             
-                    const carNamesArray = carNamesString.split(' | '); // split out the list into an array
+                    const carNamesArray = carNamesString.split(' | ');      // split out the list into an array
                     const randomIndex = Math.floor(Math.random() * carNamesArray.length);//get a random index from the carNamesArray
-                    const randomCar = carNamesArray[randomIndex]; //get the car at the random index  //Ref4  (stackoverflow, How to get random value from an array, Dec 2023)
-            
-                    document.getElementById('randomCarDisplay').innerText = 'Manager\'s Pick: ' + randomCar; // random car display element
-                }         
+                    const randomCar = carNamesArray[randomIndex];           //get the car at the random index  //Ref4  (stackoverflow, How to get random value from an array, Dec 2023)
+                    
+                    document.getElementById('randomCarDisplay').innerText = 'Manager\'s Pick: ' + randomCar; 
+                }                                       // random car display element             
                 
-
-                
-                function searchCar() {  //copy of 
+                function searchCar() {                  //ajax call to searchCar 
                     var year = document.getElementById('year').value;
                     var month = document.getElementById('month').value;
-                    $.ajax({   // request to find the car
-                        "url": "/find_car", // search request find_car
-                        "method": "POST",
-                        "data": JSON.stringify({ "year": year, "month": month }), //pass in year and month
-                        "dataType": "JSON",
+                    $.ajax({                            // request to find the car
+                        "url": "/find_car",             // search request find_car
+                        "method": "POST",               //POST request sent to the server at the URL
+                        "data": JSON.stringify({ "year": year, "month": month }),   //pass in year and month
+                        "dataType": "JSON",             //sends data in JSON form
                         contentType: "application/json; charset=utf-8",
-                        "success": function (result) {
+                        "success": function (result) {  //if request is successful HTML content is updated
                             document.getElementById('searchResult').innerHTML = "The " + result + " was the most popular car in Ireland in  " + month + " " + year;
                         },
                         "error": function (xhr, status, error) {
-                            console.log("error: " + status + " msg:" + error);
+                            console.log("error: " + status + " msg:" + error); //errors logged to the console
                         }
                     });
                 }
 
-                getAllAjax();
-                setTimeout(getScrollText, 1000); //wait until table is populated before pulling text
+                getAllAjax();                           //calls the function to populate the table when the html page is loaded
+                setTimeout(getScrollText, 1000);        //wait until table is populated before pulling text
                 
                 </script>
             </html>
